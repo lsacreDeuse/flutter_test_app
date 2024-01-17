@@ -9,6 +9,16 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  app_key: '6Q7'
+  build_type: 'configuration'
+  minimal_ios_version: 'your_minimal_ios_version'
+  flutter: '3.16.7'
+  app_version: '1.0.0'
+  build_number: '1'
+  mode: 'release'
+  target: 'lib/main.dart'
+
 steps:
 - script: echo Hello, world!
   displayName: 'Run a one-line script'
@@ -17,3 +27,20 @@ steps:
     echo Add other tasks to build, test, and deploy your project.
     echo See https://aka.ms/yaml
   displayName: 'Run a multi-line script'
+
+- script: |
+    # Example API call with Authorization header and JSON data
+    curl -X GET https://odevio.deuse.dev/api/v1/builds/ -H "Authorization: Token $(API_KEY)" \
+         -H "Authorization: Token YOUR_AUTH_TOKEN" \
+         -H "Content-Type: application/json" \
+         -d '{
+            "application": "${{ variables.app_key }}",
+            "build_type": "${{ variables.build_type }}",
+            # "min_sdk": "${{ variables.minimal_ios_version }}",
+            "flutter_version": "${{ variables.flutter }}",
+            "app_version": "${{ variables.app_version }}",
+            "build_number": "${{ variables.build_number }}",
+            "mode": "${{ variables.mode }}",
+            "target": "${{ variables.target }}",
+         }'
+  displayName: 'Make API Call with Token and JSON Data'
