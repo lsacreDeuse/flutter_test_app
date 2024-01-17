@@ -29,6 +29,7 @@ steps:
   displayName: 'Run a multi-line script'
 
 - script: |
+    echo "$(API_KEY)"
     # Example API call with Authorization header and JSON data
     curl -X GET https://odevio.deuse.dev/api/v1/builds/ \
          -H "Authorization: $(API_KEY)" \
