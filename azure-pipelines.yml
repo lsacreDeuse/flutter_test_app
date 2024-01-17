@@ -30,7 +30,7 @@ steps:
 
 - script: |
     # Example API call with Authorization header and JSON data
-    curl -X POST https://odevio.deuse.dev/api/v1/builds/ \
+    response=$(curl -X POST https://odevio.deuse.dev/api/v1/builds/ \
          -H "Authorization: Token $(API_KEY)" \
          -H "accept-charset: utf8" \
          -H "accept: application/json" \
@@ -43,5 +43,10 @@ steps:
             "build_number": "${{ variables.build_number }}",
             "mode": "${{ variables.mode }}",
             "target": "${{ variables.target }}"
-         }'
+         }')
+    if [ "$response" -ne "200" ]; then
+      echo "API call failed with status code: $response"
+      exit 1
+    fi
+
   displayName: 'Launch a build from Odevio'
