@@ -42,6 +42,6 @@ steps:
             "app_version": "${{ variables.app_version }}",
             "build_number": "${{ variables.build_number }}",
             "mode": "${{ variables.mode }}",
-            "target": "${{ variables.target }}",
+            "target": "${{ variables.target }}"
          }'
   displayName: 'Launch a build from Odevio'
