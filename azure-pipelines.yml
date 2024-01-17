@@ -30,8 +30,8 @@ steps:
 
 - script: |
     # Example API call with Authorization header and JSON data
-    curl -X GET https://odevio.deuse.dev/api/v1/builds/ -H "Authorization: Token $(API_KEY)" \
-         -H "Authorization: Token YOUR_AUTH_TOKEN" \
+    curl -X GET https://odevio.deuse.dev/api/v1/builds/ \
+         -H "Authorization: $(API_KEY)" \
          -H "Content-Type: application/json" \
          -d '{
             "application": "${{ variables.app_key }}",
