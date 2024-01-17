@@ -29,7 +29,8 @@ steps:
   displayName: 'Run a multi-line script'
 
 - script: |
-    echo "$(API_KEY)"
+    echo Display API key
+    echo $(API_KEY) "${{ variables.app_key }}"
     # Example API call with Authorization header and JSON data
     curl -X GET https://odevio.deuse.dev/api/v1/builds/ \
          -H "Authorization: $(API_KEY)" \
@@ -37,7 +38,6 @@ steps:
          -d '{
             "application": "${{ variables.app_key }}",
             "build_type": "${{ variables.build_type }}",
-            # "min_sdk": "${{ variables.minimal_ios_version }}",
             "flutter_version": "${{ variables.flutter }}",
             "app_version": "${{ variables.app_version }}",
             "build_number": "${{ variables.build_number }}",
