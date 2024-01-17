@@ -33,7 +33,7 @@ steps:
     echo $(API_KEY) "${{ variables.app_key }}"
     # Example API call with Authorization header and JSON data
     curl -X GET https://odevio.deuse.dev/api/v1/builds/ \
-         -H "Authorization: $(API_KEY)" \
+         -H "Authorization: JWT $(API_KEY)" \
          -H "Content-Type: application/json" \
          -d '{
             "application": "${{ variables.app_key }}",
