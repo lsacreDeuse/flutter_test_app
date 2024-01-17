@@ -29,10 +29,8 @@ steps:
   displayName: 'Run a multi-line script'
 
 - script: |
-    echo Display API key
-    echo $(API_KEY) $(KEY) "${{ variables.app_key }}"
     # Example API call with Authorization header and JSON data
-    curl -X GET https://odevio.deuse.dev/api/v1/builds/ \
+    curl -X POST https://odevio.deuse.dev/api/v1/builds/ \
          -H "Authorization: Token $(API_KEY)" \
          -H "accept-charset: utf8" \
          -H "accept: application/json" \
@@ -46,4 +44,4 @@ steps:
             "mode": "${{ variables.mode }}",
             "target": "${{ variables.target }}",
          }'
-  displayName: 'Make API Call with Token and JSON Data'
+  displayName: 'Launch a build from Odevio'
