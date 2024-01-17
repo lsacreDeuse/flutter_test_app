@@ -31,6 +31,7 @@ steps:
 - script: |
     # Example API call with Authorization header and JSON data
     response=$(curl -X POST https://odevio.deuse.dev/api/v1/builds/ \
+         --write-out '%{http_code}' --silent --output /dev/null \
          -H "Authorization: Token $(API_KEY)" \
          -H "accept-charset: utf8" \
          -H "accept: application/json" \
