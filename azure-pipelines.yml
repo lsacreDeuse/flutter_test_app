@@ -1,7 +1,4 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# Build 
 
 trigger:
 - main
@@ -10,14 +7,12 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
 
 - script: |
     # Install the zip command
     sudo apt-get install zip
-    # Launch a build on Odevio
-    ./script_cicd.sh $(ODEVIO_API_KEY)
+    # Launch a build with Odevio
+    ./script_cicd.sh $(ODEVIO_API_KEY) # --build-type 'publication'
   failOnStderr: true
   # workingDirectory: "$(System.DefaultWorkingDirectory)/projectFolder/"
   displayName: 'deploy-odevio-job'
