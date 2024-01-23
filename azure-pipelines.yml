@@ -1,4 +1,4 @@
-# Build 
+# Build an Flutter app with Odevio
 
 trigger:
 - main
