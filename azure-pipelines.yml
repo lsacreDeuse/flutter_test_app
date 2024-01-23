@@ -9,7 +9,7 @@ pool:
 steps:
   - script: |
       # Install the zip command
-      sudo apt-get install zip
+      #sudo apt-get install zip
       # Launch a build with Odevio
       ./script_cicd.sh $(ODEVIO_API_KEY) # --build-type 'publication'
     failOnStderr: true
