@@ -1,0 +1,23 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ruby:3.1
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- script: |
+    # Install the zip command
+    sudo apt-get install zip
+    # Launch a build on Odevio
+    ./script_cicd.sh $(ODEVIO_API_KEY)
+  failOnStderr: true
+  # workingDirectory: "$(System.DefaultWorkingDirectory)/projectFolder/"
+  displayName: 'deploy-odevio-job'
