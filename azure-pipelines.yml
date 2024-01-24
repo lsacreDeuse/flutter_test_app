@@ -1,4 +1,4 @@
-# Build an Flutter app with Odevio
+# Build a Flutter app with Odevio
 
 trigger:
 - main
@@ -8,10 +8,8 @@ pool:
 
 steps:
   - script: |
-      # Install the zip command
-      #sudo apt-get install zip
       # Launch a build with Odevio
-      ./script_cicd.sh $(ODEVIO_API_KEY) -t 'ad-hoc'
+      bash script_cicd.sh $(ODEVIO_API_KEY) -t 'ad-hoc'
     failOnStderr: true
     # workingDirectory: "$(System.DefaultWorkingDirectory)/projectFolder/"
     displayName: 'deploy-odevio-job'
