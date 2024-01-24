@@ -9,9 +9,13 @@ pool:
 steps:
   - script: |
       # Launch a build with Odevio
-      bash script_cicd.sh $(ODEVIO_API_KEY_DEV) -t publication -k 882
-      # Copy the file to the artifact staging directory
-      cp odevio_ipa_url.txt $(Build.ArtifactStagingDirectory)
+      bash script_cicd.sh $(ODEVIO_API_KEY_DEV) -t ad-hoc -k 882
+
+      # Copy the file to the artifact staging directory if it exists
+      if [ -f odevio_ipa_url.txt ]; then
+        cp odevio_ipa_url.txt $(Build.ArtifactStagingDirectory)
+      fi
+
     failOnStderr: true
     # workingDirectory: "$(System.DefaultWorkingDirectory)/projectFolder/"
     displayName: 'deploy-odevio-job'
