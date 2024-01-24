@@ -9,12 +9,20 @@ function echo_help {
 $(basename "$0") <odevio_api_key> [-d|--directory <directory/>] [-t|--build-type development|ad-hoc|distribution|validation|publication]
 
 USAGE:
-    Script used in CICD integration with Odevio.
+    Script used in CI/CD integration with Odevio.
 
 OPTIONS:
+    -h|--help           Shows this help message.
     -d|--directory      Specifies the directory of the flutter project in the current directory. It has to end with '/'. Default: './'
     -t|--build-type     Selects the build type used on Odevio. Choices are: 'development', 'ad-hoc', 'distribution', 'validation', 'publication'.
                         Default: 'publication'
+    -k|--app-key           Specifies the app key of the application on Odevio.
+    -fv|--flutter-version   Specifies the flutter version used on Odevio.
+    -iv|--minimal-ios-version   Specifies the minimal iOS version used on Odevio. If not specified, the minimal iOS version will be read from the .odevio file.
+    -m|--mode           Specifies the mode used on Odevio. 
+                        Choices are: 'debug', 'profile', 'release'.
+    -tg|--target        Specifies the target used on Odevio.
+    -f|--flavor         Specifies the flavor used on Odevio.
 "
 }
 
@@ -38,6 +46,10 @@ BUILD_TYPE="publication"
 
 while (( "$#" )); do
   case "$1" in
+    -h|--help)
+        echo_help
+        exit 0
+        ;;
     -d|--directory)
         FLUTTER_DIRECTORY=$2
         shift 2
@@ -55,8 +67,27 @@ while (( "$#" )); do
                 ;;
         esac
         ;;
+    -k|--app-key) 
+        APP_KEY="$2"; shift 2 ;;
+    -fv|--flutter-version) FLUTTER_VERSION="$2"; shift 2 ;;
+    -iv|--minimal-ios-version) MINIMAL_IOS_VERSION="$2"; shift 2 ;;
+    -m|--mode)
+        case "$2" in
+                "debug"|"profile"|"release")
+                    MODE=$2
+                    shift 2
+                    ;;
+                *)
+                    echo "Error: Invalid mode type. Must be one of: debug, profile, release"
+                    echo_help
+                    exit 1
+                    ;;
+            esac
+            ;;
+    -tg|--target) TARGET="$2"; shift 2 ;;
+    -f|--flavor) FLAVOR="$2"; shift 2 ;;
     *)
-        echo "Error: Invalid argument"
+        echo "Error: Invalid argument $1"
         echo_help
         exit 1
         ;;
@@ -84,7 +115,7 @@ function check_flutter_project {
 function check_token {
     echo -e "\n*** Check token ***"
 
-    STATUS_CODE=$(curl --silent --output /dev/null --write-out "%{http_code}" --header "Authorization: Token $1" "https://odevio.com/api/v1/my-account/")
+    STATUS_CODE=$(curl --silent --output /dev/null --write-out "%{http_code}" --header "Authorization: Token $1" "https://odevio.deuse.dev/api/v1/my-account/")
     if [ "$STATUS_CODE" -ne 200 ]; then
         echo "Error: HTTP status code is not 200"
         echo "The token is not correct"
@@ -96,11 +127,30 @@ function check_token {
     echo "[DONE]"
 }
 
+# Prints a box with the given strings as content.
+function box_out() {
+
+  local s=("$@") b w
+  for l in "${s[@]}"; do
+    ((w<${#l})) && { b="$l"; w="${#l}"; }
+  done
+  tput setaf 3
+  echo " -${b//?/-}-
+| ${b//?/ } |"
+  for l in "${s[@]}"; do
+    printf '| %s%*s%s |\n' "$(tput setaf 4)" "-$w" "$l" "$(tput setaf 3)"
+  done
+  echo "| ${b//?/ } |
+ -${b//?/-}-"
+  tput sgr 0
+
+}
+
 function read_odevio_file {
-    echo -e "\n*** Read .odevio file ***"
 
     # Open .odevio file if it exists and read the build settings
     if [ -f .odevio ]; then
+        echo -e "\n*** Read .odevio file *** \n\n ! Info: Command line arguments override the values present in the file !\n"
         while IFS= read -r line || [[ -n "$line" ]]
         do
             # Ignore lines starting with # or empty lines
@@ -133,17 +183,15 @@ function read_odevio_file {
             esac
         done < .odevio
     else
-        echo -e "Error: Missing .odevio file.\nThis file is necessary as it contains the settings of your build."
-        exit 1
+        echo -e "\n*** Parsing arguments from the command line ***"
+        echo "Info: .odevio file not found"
     fi
 
     # Check that the variables APP_KEY and FLUTTER_VERSION are set
     if [[ -z "$APP_KEY" ]] || [[ -z "$FLUTTER_VERSION" ]]; then
-        echo "Error: APP_KEY and FLUTTER_VERSION must be set in the .odevio file."
+        echo -e "\nError: APP_KEY and FLUTTER_VERSION must be set in the .odevio file or given as an argument."
         exit 1
     fi
-
-    echo "APP_KEY and FLUTTER_VERSION found in the .odevio file."
 
     echo "[DONE]"
 }
@@ -177,6 +225,22 @@ function read_pubspec_file {
     echo "APP_VERSION and BUILD_NUMBER found in the pubspec.yaml file."
 
     echo "[DONE]"
+}
+
+function print_configuration {
+     echo -e "\n*** Configuration for this build: ***"
+
+    box_out \
+        "APP_KEY = $APP_KEY" \
+        "FLUTTER_VERSION = $FLUTTER_VERSION" \
+        "BUILD_TYPE = $BUILD_TYPE" \
+        "FLUTTER_DIRECTORY = $FLUTTER_DIRECTORY" \
+        "APP_VERSION = $APP_VERSION" \
+        "BUILD_NUMBER = $BUILD_NUMBER" \
+        "MINIMAL_IOS_VERSION = $MINIMAL_IOS_VERSION" \
+        "MODE = $MODE" \
+        "TARGET = $TARGET" \
+        "FLAVOR  = $FLAVOR"
 }
 
 # This function requires the variable APP_KEY, FLUTTER_VERSION, APP_VERSION and BUILD_NUMBER to be set.
@@ -236,7 +300,7 @@ function start_build {
     [[ -n "$FLAVOR" ]] && CMD+=" -F 'flavor=$FLAVOR'"
 
     # Add the end of the command
-    CMD+=" --header 'Authorization: Token $1' 'https://odevio.com/api/v1/builds/'"
+    CMD+=" --header 'Authorization: Token $1' 'https://odevio.deuse.dev/api/v1/builds/'"
 
     # Execute the command and store the response
     RESPONSE=$(eval "$CMD")
@@ -264,8 +328,8 @@ function subscribe_to_sse {
     echo -e "\n*** Subscribe to SSE to listen to changes of the Odevio build ***"
 
     # Subscribe to SSE of the build
-    # curl -H "Authorization: Token <api_token>" -H "Accept: text/event-stream" -H "cache-control: no-cache" "https://odevio.com/events/builds/$BUILD_KEY/logs"
-    # curl -H "Authorization: JWT <token>" -H "Accept: text/event-stream" -H "cache-control: no-cache" "https://odevio.com/events/builds/$BUILD_KEY/logs"
+    # curl -H "Authorization: Token <api_token>" -H "Accept: text/event-stream" -H "cache-control: no-cache" "https://odevio.deuse.dev/events/builds/$BUILD_KEY/logs"
+    # curl -H "Authorization: JWT <token>" -H "Accept: text/event-stream" -H "cache-control: no-cache" "https://odevio.deuse.dev/events/builds/$BUILD_KEY/logs"
     
     PREV_STATUS_CODE="created"
     echo "Looking for available instance."
@@ -279,7 +343,7 @@ function subscribe_to_sse {
         # Fetch current build status
         RESPONSE=$(curl -s -w "\n%{http_code}" \
             -H "Authorization: Token $1" \
-            "https://odevio.com/api/v1/builds/$BUILD_KEY/")
+            "https://odevio.deuse.dev/api/v1/builds/$BUILD_KEY/")
 
         HTTP_STATUS=$(echo "$RESPONSE" | tail -n 1)
         RESPONSE_BODY=$(echo "$RESPONSE" | sed '$ d')
@@ -325,7 +389,7 @@ function handling_finished_build {
     if [[ "$BUILD_TYPE" == "ad-hoc" ]]; then
         RESPONSE=$(curl -s -w "\n%{http_code}" \
             -H "Authorization: Token $1" \
-            "https://odevio.com/api/v1/builds/$BUILD_KEY/ipa/")
+            "https://odevio.deuse.dev/api/v1/builds/$BUILD_KEY/ipa/")
 
         HTTP_STATUS=$(echo "$RESPONSE" | tail -n 1)
         RESPONSE_BODY=$(echo "$RESPONSE" | sed '$ d')
@@ -353,6 +417,7 @@ cd $WORKING_DIRECTORY
 check_token $TOKEN
 read_odevio_file
 read_pubspec_file
+print_configuration
 start_build $TOKEN
 subscribe_to_sse $TOKEN
 handling_finished_build $TOKEN
