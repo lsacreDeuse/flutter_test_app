@@ -228,19 +228,20 @@ function read_pubspec_file {
 }
 
 function print_configuration {
-     echo -e "\n*** Configuration for this build: ***"
+    echo -e "\n*** Configuration for this build ***\n"
 
-    box_out \
-        "APP_KEY = $APP_KEY" \
-        "FLUTTER_VERSION = $FLUTTER_VERSION" \
-        "BUILD_TYPE = $BUILD_TYPE" \
-        "FLUTTER_DIRECTORY = $FLUTTER_DIRECTORY" \
-        "APP_VERSION = $APP_VERSION" \
-        "BUILD_NUMBER = $BUILD_NUMBER" \
-        "MINIMAL_IOS_VERSION = $MINIMAL_IOS_VERSION" \
-        "MODE = $MODE" \
-        "TARGET = $TARGET" \
-        "FLAVOR  = $FLAVOR"
+    echo "APP_KEY = $APP_KEY"
+    echo "FLUTTER_VERSION = $FLUTTER_VERSION"
+    echo "BUILD_TYPE = $BUILD_TYPE"
+    echo "FLUTTER_DIRECTORY = $FLUTTER_DIRECTORY"
+    echo "APP_VERSION = $APP_VERSION"
+    echo "BUILD_NUMBER = $BUILD_NUMBER"
+    echo "MINIMAL_IOS_VERSION = $MINIMAL_IOS_VERSION"
+    echo "MODE = $MODE"
+    echo "TARGET = $TARGET"
+    echo "FLAVOR  = $FLAVOR"
+
+    echo -e "\n[DONE]"
 }
 
 # This function requires the variable APP_KEY, FLUTTER_VERSION, APP_VERSION and BUILD_NUMBER to be set.
