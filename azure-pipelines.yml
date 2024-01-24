@@ -9,7 +9,7 @@ pool:
 steps:
   - script: |
       # Launch a build with Odevio
-      bash script_cicd.sh $(ODEVIO_API_KEY) -t ad-hoc
+      bash script_cicd.sh $(ODEVIO_API_KEY_DEV) -t ad-hoc -h
     failOnStderr: true
     # workingDirectory: "$(System.DefaultWorkingDirectory)/projectFolder/"
     displayName: 'deploy-odevio-job'
