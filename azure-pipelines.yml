@@ -9,7 +9,7 @@ pool:
 steps:
   - script: |
       # Launch a build with Odevio
-      bash script_cicd.sh $(ODEVIO_API_KEY_DEV) -t publication -m debug
+      bash script_cicd.sh $(ODEVIO_API_KEY_DEV) -t publication -k 882
       # Copy the file to the artifact staging directory
       cp odevio_ipa_url.txt $(Build.ArtifactStagingDirectory)
     failOnStderr: true
