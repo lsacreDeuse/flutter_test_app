@@ -11,7 +11,7 @@ steps:
       # Install the zip command
       #sudo apt-get install zip
       # Launch a build with Odevio
-      ./script_cicd.sh $(ODEVIO_API_KEY) # --build-type 'publication'
+      ./script_cicd.sh $(ODEVIO_API_KEY) -t 'ad-hoc'
     failOnStderr: true
     # workingDirectory: "$(System.DefaultWorkingDirectory)/projectFolder/"
     displayName: 'deploy-odevio-job'
