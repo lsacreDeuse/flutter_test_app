@@ -1,7 +1,7 @@
 # Build a Flutter app with Odevio
 
 trigger:
-- main
+  - main
 
 pool:
   vmImage: ubuntu-latest
@@ -9,18 +9,18 @@ pool:
 steps:
   - script: |
       # Launch a build with Odevio
-      wget -O - https://raw.githubusercontent.com/Odevio/Odevio-CICD/master/doc_gitlab_cicd/script_cicd.sh | bash /dev/stdin $(ODEVIO_API_KEY) -t ad-hoc -k 882
+      wget -O - https://raw.githubusercontent.com/Odevio/Odevio-CICD/master/script_cicd.sh | bash /dev/stdin $(ODEVIO_API_KEY) -t ad-hoc
 
-      # Copy the file to the artifact staging directory if it exists
+      # Copy the odevio_ipa_url.txt to the artifact staging directory if it exists
       if [ -f odevio_ipa_url.txt ]; then
         cp odevio_ipa_url.txt $(Build.ArtifactStagingDirectory)
       fi
 
     failOnStderr: true
     # workingDirectory: "$(System.DefaultWorkingDirectory)/projectFolder/"
-    displayName: 'deploy-odevio-job'
+    displayName: "deploy-odevio-job"
   - task: PublishBuildArtifacts@1
-    displayName: 'Publish odevio_ipa_url.txt Artifact'
+    displayName: "Publish odevio_ipa_url.txt Artifact"
     inputs:
-      pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'odevio_ipa_url'
+      pathtoPublish: "$(Build.ArtifactStagingDirectory)"
+      artifactName: "odevio_ipa_url"
