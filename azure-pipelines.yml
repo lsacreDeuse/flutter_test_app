@@ -16,7 +16,7 @@ steps:
         cp odevio_ipa_url.txt $(Build.ArtifactStagingDirectory)
       fi
 
-    failOnStderr: false
+    failOnStderr: true
     # workingDirectory: "$(System.DefaultWorkingDirectory)/projectFolder/"
     displayName: "deploy-odevio-job"
   - task: PublishBuildArtifacts@1
