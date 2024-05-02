@@ -1,53 +1,26 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# Build a Flutter app with Odevio
 
 trigger:
-- main
+  - main
 
 pool:
   vmImage: ubuntu-latest
 
-variables:
-  app_key: '6Q7'
-  build_type: 'configuration'
-  minimal_ios_version: 'your_minimal_ios_version'
-  flutter: '3.16.7'
-  app_version: '1.0.0'
-  build_number: '1'
-  mode: 'release'
-  target: 'lib/main.dart'
-
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+  - script: |
+      # Launch a build with Odevio
+      wget -qO- https://raw.githubusercontent.com/Odevio/Odevio-CICD/master/script_cicd.sh | bash /dev/stdin $(ODEVIO_API_KEY) -t ad-hoc
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+      # Copy the odevio_ipa_url.txt to the artifact staging directory if it exists
+      if [ -f odevio_ipa_url.txt ]; then
+        cp odevio_ipa_url.txt $(Build.ArtifactStagingDirectory)
+      fi
 
-- script: |
-    # Example API call with Authorization header and JSON data
-    response=$(curl -X POST https://odevio.deuse.dev/api/v1/builds/ \
-         --write-out '%{http_code}' --silent --output /dev/null \
-         -H "Authorization: Token $(API_KEY)" \
-         -H "accept-charset: utf8" \
-         -H "accept: application/json" \
-         -H "content-type: application/json" \
-         -d '{
-            "application": "${{ variables.app_key }}",
-            "build_type": "${{ variables.build_type }}",
-            "flutter_version": "${{ variables.flutter }}",
-            "app_version": "${{ variables.app_version }}",
-            "build_number": "${{ variables.build_number }}",
-            "mode": "${{ variables.mode }}",
-            "target": "${{ variables.target }}"
-         }')
-    if [ "$response" -ne "200" ]; then
-      echo "API call failed with status code: $response"
-      exit 1
-    fi
-
-  displayName: 'Launch a build from Odevio'
+    failOnStderr: true
+    # workingDirectory: "$(System.DefaultWorkingDirectory)/projectFolder/"
+    displayName: "deploy-odevio-job"
+  - task: PublishBuildArtifacts@1
+    displayName: "Publish odevio_ipa_url.txt Artifact"
+    inputs:
+      pathtoPublish: "$(Build.ArtifactStagingDirectory)"
+      artifactName: "odevio_ipa_url"
